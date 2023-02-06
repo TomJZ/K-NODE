@@ -28,7 +28,7 @@ def plot_trajectories(fig, obs=None, noiseless_traj=None,times=None, trajs=None,
 
     fig.canvas.draw()
     fig.canvas.flush_events()
-    time.sleep(0.1)
+    # time.sleep(0.1)
     plt.show()
     if save is not None:
         plt.savefig(save+'.png', format='png', dpi=400, bbox_inches ='tight', pad_inches = 0.1)

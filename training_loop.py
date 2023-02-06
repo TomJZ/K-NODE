@@ -23,7 +23,7 @@ def sample_data(func, t_0, n_points, ics, sim_h, sampling_r):
     ratio = int(sampling_r / sim_h)
     obs = x[0::ratio]
     times = t[0::ratio]
-    return times, obs, t, x
+    return times, obs.squeeze(1), t, x.squeeze(1)
 
 
 def sample_and_grow(ode_train, true_sampled_traj, true_sampled_times, epochs,
@@ -50,15 +50,11 @@ def sample_and_grow(ode_train, true_sampled_traj, true_sampled_times, epochs,
         true_segments_list = []
         all_init = []
         for j in range(0, n_segments - lookahead + 1, 1):
-            j = j + i % 1
             true_sampled_segment = true_sampled_traj[j:j + lookahead]
-            true_sampled_time_segment = true_sampled_times[j:j + lookahead]
-            init_con = true_sampled_segment[0]
-            all_init.append(init_con)
             true_segments_list.append(true_sampled_segment)
 
-        # concatenating initial conditions from all batches
-        all_init = torch.cat(all_init).view(-1, 1, 3)
+        all_init = true_sampled_traj[:n_segments-lookahead+1]  # the initial condition for each segment
+        true_sampled_time_segment = torch.tensor(np.arange(lookahead))  # the times step to predict
 
         # predicting
         z_ = ode_train(all_init, true_sampled_time_segment, return_whole_sequence=True)

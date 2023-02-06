@@ -14,13 +14,15 @@ class Lorenz(ODEF):
         self.lin.weight = nn.Parameter(W)
 
     def forward(self, x):
-        y = y = torch.ones([1, 5])
-        y[0][0] = x[0][0]
-        y[0][1] = x[0][1]
-        y[0][2] = x[0][2]
-        y[0][3] = x[0][0] * x[0][2]
-        y[0][4] = x[0][0] * x[0][1]
-        return self.lin(y)
+        bs, _, dim = x.shape
+        y = y = torch.ones([bs, 5])
+        y[:, 0] = x[:, :, 0]
+        y[:, 1] = x[:, :, 1]
+        y[:, 2] = x[:, :, 2]
+        y[:, 3] = x[:, :, 0] * x[:, :, 2]
+        y[:, 4] = x[:, :, 0] * x[:, :, 1]
+        x_dot = self.lin(y)
+        return x_dot.view(bs, -1, dim)
 
 
 class LorenzLimitCycle(ODEF):
@@ -66,3 +68,4 @@ class LorenzSindy(ODEF):
         y[0][3] = x[0][0] * x[0][2]
         y[0][4] = x[0][0] * x[0][1]
         return self.lin(y)
+
